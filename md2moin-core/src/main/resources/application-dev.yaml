@@ -1,0 +1,6 @@
+# Logging
+logging:
+  level:
+    root: info
+    org.springframework: debug
+    net.malanius: trace
