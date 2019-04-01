@@ -1,0 +1,6 @@
+<thlogic>
+    <attr sel="#headId" th:replace="~{fragments/head::headFragment}"/>
+    <attr sel="#offset-label" th:text="#{form.offset-label}"/>
+    <attr sel="#md-submit" th:value="#{form.submit}"/>
+    <attr sel="#footerId" th:replace="~{fragments/footer::footerFragment}"/>
+</thlogic>
