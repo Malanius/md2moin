@@ -1,0 +1,4 @@
+<thlogic>
+    <attr sel="#footerFrag" th:fragment="footerFragment"/>
+    <attr sel="#createdBy" th:text="|#{footer.createdBy} Malanius 2019|"/>
+</thlogic>
