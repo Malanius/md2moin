@@ -1,4 +1,5 @@
 <thlogic>
+    <attr sel="#userName" th:text="${user}"/>
     <attr sel="#headId" th:replace="~{fragments/head::headFragment}"/>
     <attr sel="#offset-label" th:text="#{form.offset-label}"/>
     <attr sel="#md-submit" th:value="#{form.submit}"/>

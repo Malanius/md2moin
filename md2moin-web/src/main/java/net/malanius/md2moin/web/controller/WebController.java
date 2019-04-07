@@ -8,10 +8,13 @@ import net.malanius.md2moin.web.util.WebMappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -25,8 +28,9 @@ public class WebController {
     }
 
     @GetMapping(WebMappings.HOME)
-    public String getHome() {
+    public String getHome(Model model, Principal principal) {
         log.trace("getHome() - start.");
+        model.addAttribute("user", principal.getName());
         return ViewNames.HOME;
     }
 
@@ -35,6 +39,12 @@ public class WebController {
     public String postMd(@ModelAttribute("request") ConvertRequest request) {
         log.trace("postMd({}) - start.", request);
         return convertService.convert(request);
+    }
+
+    @GetMapping("/health")
+    @ResponseBody
+    public String health() {
+        return "Running...";
     }
 
 }
