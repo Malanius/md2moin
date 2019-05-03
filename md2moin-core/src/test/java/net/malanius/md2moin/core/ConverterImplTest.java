@@ -1,11 +1,11 @@
 package net.malanius.md2moin.core;
 
+import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ConverterImplTest {
 
@@ -13,7 +13,9 @@ public class ConverterImplTest {
 
     @Before
     public void setUp() {
-        converter = new ConverterImpl();
+        converter = new ConverterImpl(
+                new EmphasisConverterImpl()
+        );
     }
 
     @After
@@ -83,7 +85,7 @@ public class ConverterImplTest {
     }
 
     @Test
-    public void convertOrderedList(){
+    public void convertOrderedList() {
         String input = "1. level 1\n"
                 + "   1. level 2\n"
                 + "      1. level 3";
@@ -96,39 +98,16 @@ public class ConverterImplTest {
     }
 
     @Test
-    public void convertItalics(){
-        String input = "Some text with *italics* inside. And yet *another* occurrence.\nAnd yet *another* occurrence.";
-        String expected = "Some text with ''italics'' inside. And yet ''another'' occurrence.\nAnd yet ''another'' occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertBold(){
-        String input = "Some text with **bold** inside. And yet **another** occurrence.\nAnd yet **another** occurrence.";
-        String expected = "Some text with '''bold''' inside. And yet '''another''' occurrence.\nAnd yet '''another''' occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertBoldItalicsCombined(){
+    public void convertBoldItalicsCombined() {
         String input = "Some **bold text with *italic* inside**.\nSome **bold text with *italic* inside**.";
         String expected = "Some '''bold text with ''italic'' inside'''.\nSome '''bold text with ''italic'' inside'''.";
 
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-    @Test
-    public void convertStrikethrough(){
-        String input = "Some text with ~~strikethrough~~ inside. And yet ~~another~~ occurrence.\nAnd yet ~~another~~ occurrence.";
-        String expected = "Some text with --(strikethrough)-- inside. And yet --(another)-- occurrence.\nAnd yet --(another)-- occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
 
     @Test
-    public void convertBoldItalicsTogether(){
+    public void convertBoldItalicsTogether() {
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
         String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
 
@@ -158,7 +137,7 @@ public class ConverterImplTest {
     }
 
     @Test
-    public void convertTable(){
+    public void convertTable() {
         //TOTO implement table conversion test
         //fail("Not implemented yet");
     }
