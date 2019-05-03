@@ -120,6 +120,14 @@ public class ConverterImplTest {
     }
 
     @Test
+    public void convertStrikethrough(){
+        String input = "Some text with ~~strikethrough~~ inside. And yet ~~another~~ occurrence.\nAnd yet ~~another~~ occurrence.";
+        String expected = "Some text with --(strikethrough)-- inside. And yet --(another)-- occurrence.\nAnd yet --(another)-- occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
     public void convertBoldItalicsTogether(){
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
         String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
