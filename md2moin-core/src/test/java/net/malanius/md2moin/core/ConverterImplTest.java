@@ -1,11 +1,15 @@
 package net.malanius.md2moin.core;
 
+import net.malanius.md2moin.core.codeblocks.CodeBlockConverterImpl;
+import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
+import net.malanius.md2moin.core.headers.HeaderConverterImpl;
+import net.malanius.md2moin.core.lists.ListConverterImpl;
+import net.malanius.md2moin.core.tables.TableConverterImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ConverterImplTest {
 
@@ -13,37 +17,17 @@ public class ConverterImplTest {
 
     @Before
     public void setUp() {
-        converter = new ConverterImpl();
+        converter = new ConverterImpl(
+                new EmphasisConverterImpl(),
+                new HeaderConverterImpl(),
+                new ListConverterImpl(),
+                new CodeBlockConverterImpl(),
+                new TableConverterImpl());
     }
 
     @After
     public void tearDown() {
         converter = null;
-    }
-
-    @Test
-    public void convertH1NoOffset() {
-        assertEquals("= H1 =", converter.convertToMoin("# H1"));
-    }
-
-    @Test
-    public void convertH2NoOffset() {
-        assertEquals("== H2 ==", converter.convertToMoin("## H2"));
-    }
-
-    @Test
-    public void convertH3NoOffset() {
-        assertEquals("=== H3 ===", converter.convertToMoin("### H3"));
-    }
-
-    @Test
-    public void convertH4NoOffset() {
-        assertEquals("==== H4 ====", converter.convertToMoin("#### H4"));
-    }
-
-    @Test
-    public void convertH5NoOffset() {
-        assertEquals("===== H5 =====", converter.convertToMoin("##### H5"));
     }
 
     @Test
@@ -71,95 +55,20 @@ public class ConverterImplTest {
     }
 
     @Test
-    public void convertUnorderedList() {
-        String input = "- item level 1\n"
-                + "  - item level 2\n"
-                + "    - item level 3";
-        String expected = " * item level 1\n"
-                + "   * item level 2\n"
-                + "     * item level 3";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertOrderedList(){
-        String input = "1. level 1\n"
-                + "   1. level 2\n"
-                + "      1. level 3";
-
-        String expected = " 1. level 1\n"
-                + "    1. level 2\n"
-                + "       1. level 3";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertItalics(){
-        String input = "Some text with *italics* inside. And yet *another* occurrence.\nAnd yet *another* occurrence.";
-        String expected = "Some text with ''italics'' inside. And yet ''another'' occurrence.\nAnd yet ''another'' occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertBold(){
-        String input = "Some text with **bold** inside. And yet **another** occurrence.\nAnd yet **another** occurrence.";
-        String expected = "Some text with '''bold''' inside. And yet '''another''' occurrence.\nAnd yet '''another''' occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertBoldItalicsCombined(){
+    public void convertBoldItalicsCombined() {
         String input = "Some **bold text with *italic* inside**.\nSome **bold text with *italic* inside**.";
         String expected = "Some '''bold text with ''italic'' inside'''.\nSome '''bold text with ''italic'' inside'''.";
 
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-    @Test
-    public void convertStrikethrough(){
-        String input = "Some text with ~~strikethrough~~ inside. And yet ~~another~~ occurrence.\nAnd yet ~~another~~ occurrence.";
-        String expected = "Some text with --(strikethrough)-- inside. And yet --(another)-- occurrence.\nAnd yet --(another)-- occurrence.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
 
     @Test
-    public void convertBoldItalicsTogether(){
+    public void convertBoldItalicsTogether() {
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
         String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
 
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-    @Test
-    public void convertInlineCode() {
-        String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
-        String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertCodeBlock() {
-        String input = "```bash\n"
-                + "#!/bin/bash\n"
-                + "echo test\n"
-                + "```";
-        String expected = "{{{#!highlight bash\n"
-                + "#!/bin/bash\n"
-                + "echo test\n"
-                + "}}}";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertTable(){
-        //TOTO implement table conversion test
-        //fail("Not implemented yet");
-    }
 }
