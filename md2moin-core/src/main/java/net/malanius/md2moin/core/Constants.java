@@ -28,7 +28,7 @@ final class Constants {
     static final String ORDERED_LIST_REPLACE =  " $1";
 
     static final String CODE_BLOCK_START_FIND = "^```(.+)$";
-    static final String CODE_BLOCK_START_REPALCE = "{{{#!highlight $1";
+    static final String CODE_BLOCK_START_REPLACE = "{{{#!highlight $1";
 
     static final String CODE_BLOCK_END_FIND = "^```$";
     static final String CODE_BLOCK_END_REPLACE = "}}}";

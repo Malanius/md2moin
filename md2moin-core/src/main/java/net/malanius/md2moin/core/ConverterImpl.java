@@ -93,7 +93,7 @@ public class ConverterImpl implements Converter {
 
         Pattern codeBlockStartPattern = Pattern.compile(Constants.CODE_BLOCK_START_FIND, Pattern.MULTILINE);
         Matcher codeBlockStartMatcher = codeBlockStartPattern.matcher(input);
-        String temp = codeBlockStartMatcher.replaceAll(Constants.CODE_BLOCK_START_REPALCE);
+        String temp = codeBlockStartMatcher.replaceAll(Constants.CODE_BLOCK_START_REPLACE);
 
         Pattern codeBlockEndPattern = Pattern.compile(Constants.CODE_BLOCK_END_FIND, Pattern.MULTILINE);
         Matcher codeBlockEndMatcher = codeBlockEndPattern.matcher(temp);
