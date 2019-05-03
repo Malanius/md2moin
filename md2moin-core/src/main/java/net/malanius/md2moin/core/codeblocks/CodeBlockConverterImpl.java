@@ -14,13 +14,13 @@ public class CodeBlockConverterImpl implements CodeblockConverter {
     public String convertCodeBlock(String input) {
         log.trace("convertCodeBlock()");
 
-        Pattern codeBlockStartPattern = Pattern.compile(CodeblockConstants.CODE_BLOCK_START_FIND, Pattern.MULTILINE);
+        Pattern codeBlockStartPattern = Pattern.compile(CodeBlockConstants.CODE_BLOCK_START_FIND, Pattern.MULTILINE);
         Matcher codeBlockStartMatcher = codeBlockStartPattern.matcher(input);
-        String temp = codeBlockStartMatcher.replaceAll(CodeblockConstants.CODE_BLOCK_START_REPLACE);
+        String temp = codeBlockStartMatcher.replaceAll(CodeBlockConstants.CODE_BLOCK_START_REPLACE);
 
-        Pattern codeBlockEndPattern = Pattern.compile(CodeblockConstants.CODE_BLOCK_END_FIND, Pattern.MULTILINE);
+        Pattern codeBlockEndPattern = Pattern.compile(CodeBlockConstants.CODE_BLOCK_END_FIND, Pattern.MULTILINE);
         Matcher codeBlockEndMatcher = codeBlockEndPattern.matcher(temp);
-        return codeBlockEndMatcher.replaceAll(CodeblockConstants.CODE_BLOCK_END_REPLACE
+        return codeBlockEndMatcher.replaceAll(CodeBlockConstants.CODE_BLOCK_END_REPLACE
         );
     }
 
@@ -28,9 +28,9 @@ public class CodeBlockConverterImpl implements CodeblockConverter {
     public String convertInlineCode(String input) {
         log.trace("convertInlineCode()");
 
-        Pattern unorderedListPattern = Pattern.compile(CodeblockConstants.INLINE_CODE_FIND);
+        Pattern unorderedListPattern = Pattern.compile(CodeBlockConstants.INLINE_CODE_FIND);
         Matcher unorderedListMatcher = unorderedListPattern.matcher(input);
-        return unorderedListMatcher.replaceAll(CodeblockConstants.INLINE_CODE_REPLACE);
+        return unorderedListMatcher.replaceAll(CodeBlockConstants.INLINE_CODE_REPLACE);
     }
 
 }

@@ -62,7 +62,6 @@ public class ConverterImplTest {
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-
     @Test
     public void convertBoldItalicsTogether() {
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
