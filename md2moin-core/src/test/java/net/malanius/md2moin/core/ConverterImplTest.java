@@ -1,6 +1,7 @@
 package net.malanius.md2moin.core;
 
 import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
+import net.malanius.md2moin.core.headers.HeaderConverterImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,8 @@ public class ConverterImplTest {
     @Before
     public void setUp() {
         converter = new ConverterImpl(
-                new EmphasisConverterImpl()
-        );
+                new EmphasisConverterImpl(),
+                new HeaderConverterImpl());
     }
 
     @After
@@ -23,30 +24,7 @@ public class ConverterImplTest {
         converter = null;
     }
 
-    @Test
-    public void convertH1NoOffset() {
-        assertEquals("= H1 =", converter.convertToMoin("# H1"));
-    }
 
-    @Test
-    public void convertH2NoOffset() {
-        assertEquals("== H2 ==", converter.convertToMoin("## H2"));
-    }
-
-    @Test
-    public void convertH3NoOffset() {
-        assertEquals("=== H3 ===", converter.convertToMoin("### H3"));
-    }
-
-    @Test
-    public void convertH4NoOffset() {
-        assertEquals("==== H4 ====", converter.convertToMoin("#### H4"));
-    }
-
-    @Test
-    public void convertH5NoOffset() {
-        assertEquals("===== H5 =====", converter.convertToMoin("##### H5"));
-    }
 
     @Test
     public void convertMultipleHeadings() {
