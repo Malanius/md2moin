@@ -96,6 +96,46 @@ public class ConverterImplTest {
     }
 
     @Test
+    public void convertItalics(){
+        String input = "Some text with *italics* inside. And yet *another* occurrence.\nAnd yet *another* occurrence.";
+        String expected = "Some text with ''italics'' inside. And yet ''another'' occurrence.\nAnd yet ''another'' occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
+    public void convertBold(){
+        String input = "Some text with **bold** inside. And yet **another** occurrence.\nAnd yet **another** occurrence.";
+        String expected = "Some text with '''bold''' inside. And yet '''another''' occurrence.\nAnd yet '''another''' occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
+    public void convertBoldItalicsCombined(){
+        String input = "Some **bold text with *italic* inside**.\nSome **bold text with *italic* inside**.";
+        String expected = "Some '''bold text with ''italic'' inside'''.\nSome '''bold text with ''italic'' inside'''.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
+    public void convertStrikethrough(){
+        String input = "Some text with ~~strikethrough~~ inside. And yet ~~another~~ occurrence.\nAnd yet ~~another~~ occurrence.";
+        String expected = "Some text with --(strikethrough)-- inside. And yet --(another)-- occurrence.\nAnd yet --(another)-- occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
+    public void convertBoldItalicsTogether(){
+        String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
+        String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
     public void convertInlineCode() {
         String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
         String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
