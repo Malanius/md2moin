@@ -11,12 +11,12 @@ public class LinkConverterImplTest {
     private LinkConverter converter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new LinkConverterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         converter = null;
     }
 

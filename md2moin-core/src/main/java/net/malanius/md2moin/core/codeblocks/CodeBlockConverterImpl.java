@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
-public class CodeBlockConverterImpl implements CodeblockConverter {
+public class CodeBlockConverterImpl implements CodeBlockConverter {
 
     @Override
     public String convertCodeBlock(String input) {

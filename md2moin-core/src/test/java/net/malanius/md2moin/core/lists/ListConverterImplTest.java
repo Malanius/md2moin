@@ -11,12 +11,12 @@ public class ListConverterImplTest {
     private ListConverter converter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new ListConverterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         converter = null;
     }
 

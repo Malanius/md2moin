@@ -1,7 +1,7 @@
 package net.malanius.md2moin.core;
 
 import lombok.extern.slf4j.Slf4j;
-import net.malanius.md2moin.core.codeblocks.CodeblockConverter;
+import net.malanius.md2moin.core.codeblocks.CodeBlockConverter;
 import net.malanius.md2moin.core.emphasis.EmphasisConverter;
 import net.malanius.md2moin.core.headers.HeaderConverter;
 import net.malanius.md2moin.core.lists.ListConverter;
@@ -16,15 +16,15 @@ public class ConverterImpl implements Converter {
     private final EmphasisConverter emphasisConverter;
     private final HeaderConverter headerConverter;
     private final ListConverter listConverter;
-    private final CodeblockConverter codeblockConverter;
+    private final CodeBlockConverter codeblockConverter;
     private final TableConverter tableConverter;
 
     @Autowired
-    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeblockConverter codeblockConverterl, TableConverter tableConverter) {
+    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeBlockConverter codeBlockConverter, TableConverter tableConverter) {
         this.emphasisConverter = emphasisConverter;
         this.headerConverter = headerConverter;
         this.listConverter = listConverter;
-        this.codeblockConverter = codeblockConverterl;
+        this.codeblockConverter = codeBlockConverter;
         this.tableConverter = tableConverter;
     }
 

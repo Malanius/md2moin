@@ -8,15 +8,16 @@ import static org.junit.Assert.assertEquals;
 
 public class CodeBlockConverterImplTest {
 
-    private CodeblockConverter converter;
+    private CodeBlockConverter converter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new CodeBlockConverterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
+        converter = null;
     }
 
     @Test
