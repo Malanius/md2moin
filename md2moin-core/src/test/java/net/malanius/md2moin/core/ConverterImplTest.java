@@ -5,9 +5,14 @@ import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import net.malanius.md2moin.core.headers.HeaderConverterImpl;
 import net.malanius.md2moin.core.lists.ListConverterImpl;
 import net.malanius.md2moin.core.tables.TableConverterImpl;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 
@@ -62,11 +67,20 @@ public class ConverterImplTest {
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-
     @Test
     public void convertBoldItalicsTogether() {
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
         String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
+    public void fullConversionTest() throws IOException {
+        String input = IOUtils.toString(Objects.requireNonNull(
+                this.getClass().getClassLoader().getResourceAsStream("test.md")), StandardCharsets.UTF_8);
+        String expected = IOUtils.toString(Objects.requireNonNull(
+                this.getClass().getClassLoader().getResourceAsStream("test.moin")), StandardCharsets.UTF_8);
 
         assertEquals(expected, converter.convertToMoin(input));
     }

@@ -4,19 +4,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CodeBlockConverterImplTest {
 
-    private CodeblockConverter converter;
+    private CodeBlockConverter converter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new CodeBlockConverterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
+        converter = null;
     }
 
     @Test
