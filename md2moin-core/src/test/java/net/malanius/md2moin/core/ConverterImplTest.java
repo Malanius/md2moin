@@ -4,6 +4,7 @@ import net.malanius.md2moin.core.codeblocks.CodeBlockConverterImpl;
 import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import net.malanius.md2moin.core.headers.HeaderConverterImpl;
 import net.malanius.md2moin.core.lists.ListConverterImpl;
+import net.malanius.md2moin.core.tables.TableConverterImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,15 +21,14 @@ public class ConverterImplTest {
                 new EmphasisConverterImpl(),
                 new HeaderConverterImpl(),
                 new ListConverterImpl(),
-                new CodeBlockConverterImpl());
+                new CodeBlockConverterImpl(),
+                new TableConverterImpl());
     }
 
     @After
     public void tearDown() {
         converter = null;
     }
-
-
 
     @Test
     public void convertMultipleHeadings() {
@@ -71,9 +71,4 @@ public class ConverterImplTest {
         assertEquals(expected, converter.convertToMoin(input));
     }
 
-    @Test
-    public void convertTable() {
-        //TOTO implement table conversion test
-        //fail("Not implemented yet");
-    }
 }

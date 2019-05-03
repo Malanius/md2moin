@@ -5,6 +5,7 @@ import net.malanius.md2moin.core.codeblocks.CodeblockConverter;
 import net.malanius.md2moin.core.emphasis.EmphasisConverter;
 import net.malanius.md2moin.core.headers.HeaderConverter;
 import net.malanius.md2moin.core.lists.ListConverter;
+import net.malanius.md2moin.core.tables.TableConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +17,15 @@ public class ConverterImpl implements Converter {
     private final HeaderConverter headerConverter;
     private final ListConverter listConverter;
     private final CodeblockConverter codeblockConverter;
+    private final TableConverter tableConverter;
 
     @Autowired
-    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeblockConverter codeblockConverterl) {
+    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeblockConverter codeblockConverterl, TableConverter tableConverter) {
         this.emphasisConverter = emphasisConverter;
         this.headerConverter = headerConverter;
         this.listConverter = listConverter;
         this.codeblockConverter = codeblockConverterl;
+        this.tableConverter = tableConverter;
     }
 
     @Override
@@ -46,14 +49,8 @@ public class ConverterImpl implements Converter {
         converted = emphasisConverter.convertStrikethrough(converted);
         converted = codeblockConverter.convertCodeBlock(converted);
         converted = codeblockConverter.convertInlineCode(converted);
-        converted = convertTable(converted);
+        converted = tableConverter.convertTable(converted);
         return converted;
     }
 
-    public String convertTable(String input) {
-        log.trace("convertTable()");
-
-        //TODO implement table conversion
-        return input;
-    }
 }
