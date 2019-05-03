@@ -28,6 +28,7 @@ public class ConverterImpl implements Converter {
         converted = convertOrderedList(converted);
         converted = convertBold(converted);
         converted = convertItalics(converted);
+        converted = convertStrikethrough(converted);
         converted = convertCodeBlock(converted);
         converted = convertInlineCode(converted);
         converted = convertTable(converted);
@@ -99,11 +100,19 @@ public class ConverterImpl implements Converter {
     }
 
     private String convertItalics(String input) {
-        log.trace("convertOrderedList()");
+        log.trace("convertItalics()");
 
         Pattern orderedListPattern = Pattern.compile(Constants.ITALICS_FIND, Pattern.MULTILINE);
         Matcher orderedListMatcher = orderedListPattern.matcher(input);
         return orderedListMatcher.replaceAll(Constants.ITALICS_REPLACE);
+    }
+
+    private String convertStrikethrough(String input) {
+        log.trace("convertStrikethrough()");
+
+        Pattern orderedListPattern = Pattern.compile(Constants.STRIKETHROUGH_FIND, Pattern.MULTILINE);
+        Matcher orderedListMatcher = orderedListPattern.matcher(input);
+        return orderedListMatcher.replaceAll(Constants.STRIKETHROUGH_REPLACE);
     }
 
     private String convertCodeBlock(String input) {

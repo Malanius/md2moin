@@ -33,6 +33,9 @@ final class Constants {
     static final String ITALICS_FIND = "\\*(.+?)\\*";
     static final String ITALICS_REPLACE =  "''$1''";
 
+    static final String STRIKETHROUGH_FIND = "~~(.+?)~~";
+    static final String STRIKETHROUGH_REPLACE =  "--($1)--";
+
     static final String CODE_BLOCK_START_FIND = "^```(.+)$";
     static final String CODE_BLOCK_START_REPLACE = "{{{#!highlight $1";
 
