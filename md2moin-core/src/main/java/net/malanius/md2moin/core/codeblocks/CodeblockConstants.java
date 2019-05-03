@@ -1,8 +1,8 @@
-package net.malanius.md2moin.core;
+package net.malanius.md2moin.core.codeblocks;
 
-final class Constants {
+final class CodeblockConstants {
 
-    private Constants(){
+    private CodeblockConstants(){
         //no instances allowed
     }
 

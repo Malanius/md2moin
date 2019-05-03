@@ -1,5 +1,6 @@
 package net.malanius.md2moin.core;
 
+import net.malanius.md2moin.core.codeblocks.CodeBlockConverterImpl;
 import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import net.malanius.md2moin.core.headers.HeaderConverterImpl;
 import net.malanius.md2moin.core.lists.ListConverterImpl;
@@ -18,7 +19,8 @@ public class ConverterImplTest {
         converter = new ConverterImpl(
                 new EmphasisConverterImpl(),
                 new HeaderConverterImpl(),
-                new ListConverterImpl());
+                new ListConverterImpl(),
+                new CodeBlockConverterImpl());
     }
 
     @After
@@ -65,28 +67,6 @@ public class ConverterImplTest {
     public void convertBoldItalicsTogether() {
         String input = "Some ***bold italic text with inside***.\nSome ***bold italic text with inside***.";
         String expected = "Some '''''bold italic text with inside'''''.\nSome '''''bold italic text with inside'''''.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertInlineCode() {
-        String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
-        String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertCodeBlock() {
-        String input = "```bash\n"
-                + "#!/bin/bash\n"
-                + "echo test\n"
-                + "```";
-        String expected = "{{{#!highlight bash\n"
-                + "#!/bin/bash\n"
-                + "echo test\n"
-                + "}}}";
 
         assertEquals(expected, converter.convertToMoin(input));
     }
