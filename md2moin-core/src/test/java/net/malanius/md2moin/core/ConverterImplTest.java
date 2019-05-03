@@ -104,6 +104,14 @@ public class ConverterImplTest {
     }
 
     @Test
+    public void convertBold(){
+        String input = "Some text with **bold** inside. And yet **another** occurrence.\nAnd yet **another** occurrence.";
+        String expected = "Some text with '''bold''' inside. And yet '''another''' occurrence.\nAnd yet '''another''' occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
     public void convertInlineCode() {
         String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
         String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
