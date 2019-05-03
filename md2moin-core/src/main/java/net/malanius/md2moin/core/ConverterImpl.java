@@ -42,11 +42,11 @@ public class ConverterImpl implements Converter {
         converted = headerConverter.convertH3(converted);
         converted = headerConverter.convertH4(converted);
         converted = headerConverter.convertH5(converted);
-        converted = listConverter.convertUnorderedList(converted);
-        converted = listConverter.convertOrderedList(converted);
         converted = emphasisConverter.convertBold(converted);
         converted = emphasisConverter.convertItalics(converted);
         converted = emphasisConverter.convertStrikethrough(converted);
+        converted = listConverter.convertUnorderedList(converted);
+        converted = listConverter.convertOrderedList(converted);
         converted = codeblockConverter.convertCodeBlock(converted);
         converted = codeblockConverter.convertInlineCode(converted);
         converted = tableConverter.convertTable(converted);
