@@ -26,6 +26,9 @@ public class ConverterImpl implements Converter {
         converted = convertH5(converted);
         converted = convertUnorderedList(converted);
         converted = convertOrderedList(converted);
+        converted = convertBold(converted);
+        converted = convertItalics(converted);
+        converted = convertStrikethrough(converted);
         converted = convertCodeBlock(converted);
         converted = convertInlineCode(converted);
         converted = convertTable(converted);
@@ -88,12 +91,36 @@ public class ConverterImpl implements Converter {
         return orderedListMatcher.replaceAll(Constants.ORDERED_LIST_REPLACE);
     }
 
+    private String convertBold(String input) {
+        log.trace("convertBold()");
+
+        Pattern orderedListPattern = Pattern.compile(Constants.BOLD_FIND, Pattern.MULTILINE);
+        Matcher orderedListMatcher = orderedListPattern.matcher(input);
+        return orderedListMatcher.replaceAll(Constants.BOLD_REPLACE);
+    }
+
+    private String convertItalics(String input) {
+        log.trace("convertItalics()");
+
+        Pattern orderedListPattern = Pattern.compile(Constants.ITALICS_FIND, Pattern.MULTILINE);
+        Matcher orderedListMatcher = orderedListPattern.matcher(input);
+        return orderedListMatcher.replaceAll(Constants.ITALICS_REPLACE);
+    }
+
+    private String convertStrikethrough(String input) {
+        log.trace("convertStrikethrough()");
+
+        Pattern orderedListPattern = Pattern.compile(Constants.STRIKETHROUGH_FIND, Pattern.MULTILINE);
+        Matcher orderedListMatcher = orderedListPattern.matcher(input);
+        return orderedListMatcher.replaceAll(Constants.STRIKETHROUGH_REPLACE);
+    }
+
     private String convertCodeBlock(String input) {
         log.trace("convertCodeBlock()");
 
         Pattern codeBlockStartPattern = Pattern.compile(Constants.CODE_BLOCK_START_FIND, Pattern.MULTILINE);
         Matcher codeBlockStartMatcher = codeBlockStartPattern.matcher(input);
-        String temp = codeBlockStartMatcher.replaceAll(Constants.CODE_BLOCK_START_REPALCE);
+        String temp = codeBlockStartMatcher.replaceAll(Constants.CODE_BLOCK_START_REPLACE);
 
         Pattern codeBlockEndPattern = Pattern.compile(Constants.CODE_BLOCK_END_FIND, Pattern.MULTILINE);
         Matcher codeBlockEndMatcher = codeBlockEndPattern.matcher(temp);
