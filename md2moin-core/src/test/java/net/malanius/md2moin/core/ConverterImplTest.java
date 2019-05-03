@@ -96,6 +96,14 @@ public class ConverterImplTest {
     }
 
     @Test
+    public void convertItalics(){
+        String input = "Some text with *italics* inside. And yet *another* occurrence.\nAnd yet *another* occurrence.";
+        String expected = "Some text with ''italics'' inside. And yet ''another'' occurrence.\nAnd yet ''another'' occurrence.";
+
+        assertEquals(expected, converter.convertToMoin(input));
+    }
+
+    @Test
     public void convertInlineCode() {
         String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
         String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
