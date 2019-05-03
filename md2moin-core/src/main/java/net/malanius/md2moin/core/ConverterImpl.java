@@ -3,6 +3,7 @@ package net.malanius.md2moin.core;
 import lombok.extern.slf4j.Slf4j;
 import net.malanius.md2moin.core.emphasis.EmphasisConverter;
 import net.malanius.md2moin.core.headers.HeaderConverter;
+import net.malanius.md2moin.core.lists.ListConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,13 @@ public class ConverterImpl implements Converter {
 
     private final EmphasisConverter emphasisConverter;
     private final HeaderConverter headerConverter;
+    private final ListConverter listConverter;
 
     @Autowired
-    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter) {
+    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter) {
         this.emphasisConverter = emphasisConverter;
         this.headerConverter = headerConverter;
+        this.listConverter = listConverter;
     }
 
     @Override
@@ -36,8 +39,8 @@ public class ConverterImpl implements Converter {
         converted = headerConverter.convertH3(converted);
         converted = headerConverter.convertH4(converted);
         converted = headerConverter.convertH5(converted);
-        converted = convertUnorderedList(converted);
-        converted = convertOrderedList(converted);
+        converted = listConverter.convertUnorderedList(converted);
+        converted = listConverter.convertOrderedList(converted);
         converted = emphasisConverter.convertBold(converted);
         converted = emphasisConverter.convertItalics(converted);
         converted = emphasisConverter.convertStrikethrough(converted);
@@ -49,21 +52,7 @@ public class ConverterImpl implements Converter {
 
 
 
-    public String convertUnorderedList(String input) {
-        log.trace("convertUnorderedList()");
 
-        Pattern unorderedListPattern = Pattern.compile(Constants.UNORDERED_LIST_FIND, Pattern.MULTILINE);
-        Matcher unorderedListMatcher = unorderedListPattern.matcher(input);
-        return unorderedListMatcher.replaceAll(Constants.UNORDERED_LIST_REPLACE);
-    }
-
-    public String convertOrderedList(String input) {
-        log.trace("convertOrderedList()");
-
-        Pattern orderedListPattern = Pattern.compile(Constants.ORDERED_LIST_FIND, Pattern.MULTILINE);
-        Matcher orderedListMatcher = orderedListPattern.matcher(input);
-        return orderedListMatcher.replaceAll(Constants.ORDERED_LIST_REPLACE);
-    }
 
     public String convertCodeBlock(String input) {
         log.trace("convertCodeBlock()");

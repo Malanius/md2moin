@@ -2,6 +2,7 @@ package net.malanius.md2moin.core;
 
 import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import net.malanius.md2moin.core.headers.HeaderConverterImpl;
+import net.malanius.md2moin.core.lists.ListConverterImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,8 @@ public class ConverterImplTest {
     public void setUp() {
         converter = new ConverterImpl(
                 new EmphasisConverterImpl(),
-                new HeaderConverterImpl());
+                new HeaderConverterImpl(),
+                new ListConverterImpl());
     }
 
     @After
@@ -46,31 +48,6 @@ public class ConverterImplTest {
                 + "==== H4 ====\n"
                 + "\n"
                 + "===== H5 =====";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertUnorderedList() {
-        String input = "- item level 1\n"
-                + "  - item level 2\n"
-                + "    - item level 3";
-        String expected = " * item level 1\n"
-                + "   * item level 2\n"
-                + "     * item level 3";
-
-        assertEquals(expected, converter.convertToMoin(input));
-    }
-
-    @Test
-    public void convertOrderedList() {
-        String input = "1. level 1\n"
-                + "   1. level 2\n"
-                + "      1. level 3";
-
-        String expected = " 1. level 1\n"
-                + "    1. level 2\n"
-                + "       1. level 3";
 
         assertEquals(expected, converter.convertToMoin(input));
     }
