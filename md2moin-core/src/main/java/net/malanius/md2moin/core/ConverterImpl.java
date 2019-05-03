@@ -26,6 +26,7 @@ public class ConverterImpl implements Converter {
         converted = convertH5(converted);
         converted = convertUnorderedList(converted);
         converted = convertOrderedList(converted);
+        converted = convertItalics(converted);
         converted = convertCodeBlock(converted);
         converted = convertInlineCode(converted);
         converted = convertTable(converted);
@@ -86,6 +87,14 @@ public class ConverterImpl implements Converter {
         Pattern orderedListPattern = Pattern.compile(Constants.ORDERED_LIST_FIND, Pattern.MULTILINE);
         Matcher orderedListMatcher = orderedListPattern.matcher(input);
         return orderedListMatcher.replaceAll(Constants.ORDERED_LIST_REPLACE);
+    }
+
+    private String convertItalics(String input) {
+        log.trace("convertOrderedList()");
+
+        Pattern orderedListPattern = Pattern.compile(Constants.ITALICS_FIND, Pattern.MULTILINE);
+        Matcher orderedListMatcher = orderedListPattern.matcher(input);
+        return orderedListMatcher.replaceAll(Constants.ITALICS_REPLACE);
     }
 
     private String convertCodeBlock(String input) {
