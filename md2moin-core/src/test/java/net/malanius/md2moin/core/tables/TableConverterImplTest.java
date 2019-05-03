@@ -4,25 +4,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TableConverterImplTest {
 
     private TableConverter converter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new TableConverterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         converter = null;
     }
 
     @Test
     public void convertTable() {
-        //TOTO implement table conversion test
+        //TODO implement table conversion test
         //fail("Not implemented yet");
+        String input = "not implemented";
+        String expected = "not implemented";
+
+        assertEquals(expected, converter.convertTable(input));
     }
 }
