@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template for ECR repository and IAM user able to push images into it
+
+Parameters:
+  AppName:
+    Description: Application name (lowercase)
+    Type: String
+  ImageName:
+    Description: ECR image name (lowercase)
+    Type: String
+  AppEnv:
+    Description: Environment (dev/int/ope)
+    Type: String
+    AllowedValues:
+      - dev
+      - int
+      - ope
+
+Resources:
+  EcrRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${AppName}-${AppEnv}/${ImageName}
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+              "rules": [
+                  {
+                      "rulePriority": 1,
+                      "description": "Expire images older than 14 days",
+                      "selection": {
+                          "tagStatus": "untagged",
+                          "countType": "sinceImagePushed",
+                          "countUnit": "days",
+                          "countNumber": 14
+                      },
+                      "action": {
+                          "type": "expire"
+                      }
+                  }
+              ]
+          }
+
+  EcrUser:
+    Type: AWS::IAM::User
+    Properties:
+      Path: /technical-user/
+      UserName: !Sub ${AppName}-${AppEnv}-deploy
+
+  S3UserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName:
+        !Ref EcrUser
+
+  EcrUserPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AppName}-${AppEnv}-ecr-user
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - ecr:*
+            Resource:
+              - !Sub
+                - arn:aws:ecr:*:${AWS::AccountId}:repository/${Repo}
+                - { Repo: !Ref EcrRepo}
+          - Effect: Allow
+            Action: ecr:GetAuthorizationToken
+            Resource:
+              - "*"
+      Users:
+        - !Ref EcrUser
+
+Outputs:
+  EcrRepoName:
+    Value: !Ref EcrRepo
+    Export:
+      Name: !Sub ${AppName}-${AppEnv}-ecr-name
+    Description: Name of the ECR repostitory
+  EcrUserAccessKey:
+    Value: !Ref  S3UserAccessKey
+    Description: Access key of the user who may upload files into the S3
+  EcrUserSecretAccessKey:
+    Value: !GetAtt S3UserAccessKey.SecretAccessKey
+    Description: Secret key of the user who may upload files into the S3
