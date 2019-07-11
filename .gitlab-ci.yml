@@ -29,8 +29,8 @@ build_app:
   script:
     - cd md2moin-web
     - $(aws ecr get-login --no-include-email --region eu-west-1)
-    - docker build -t ${ECR_REPOSITORY}/md2moin-web .
-    - docker push ${ECR_REPOSITORY}/md2moin-web
+    - docker build -t ${ECR_REPOSITORY}/md2moin-web:${CI_COMMIT_SHORT_SHA} .
+    - docker push ${ECR_REPOSITORY}/md2moin-web:${CI_COMMIT_SHORT_SHA}
 
 push_image_dev:
   <<: *build_push_image
