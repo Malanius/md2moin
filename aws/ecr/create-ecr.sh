@@ -6,7 +6,7 @@ if [[ ${ENV} == "dev" ]] || [[ ${ENV} == "int" ]] || [[ ${ENV} == "ope" ]]; then
         . ../_scripts/env.sh ${ENV}
          aws cloudformation create-stack \
             --template-body "file://ecr.yaml" \
-            --stack-name "${APP_NAME}-${APP_ENV}-ecr-user" \
+            --stack-name "${APP_NAME}-${APP_ENV}-ecr" \
             --tags \
                 "Key=Env,Value=${APP_ENV^^}" \
                 "Key=tf:owner,Value=${OWNER}" \
