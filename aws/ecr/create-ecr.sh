@@ -3,7 +3,7 @@
 ENV=${1}
 if [[ ${ENV} == "dev" ]] || [[ ${ENV} == "int" ]] || [[ ${ENV} == "ope" ]]; then
         echo "Creating stack with ${ENV^^} configuration...";
-        . env.sh ${ENV}
+        . ../_scripts/env.sh ${ENV}
          aws cloudformation create-stack \
             --template-body "file://ecr.yaml" \
             --stack-name "${APP_NAME}-${APP_ENV}-ecr-user" \
@@ -25,4 +25,4 @@ if [[ ${ENV} == "dev" ]] || [[ ${ENV} == "int" ]] || [[ ${ENV} == "ope" ]]; then
         echo "Wrong environment specified, not executing deploy goal!"
 fi
 
-. reset.sh
+. ../_scripts/reset.sh
