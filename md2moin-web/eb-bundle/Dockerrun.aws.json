@@ -1,0 +1,21 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Volumes": [
+        {
+            "HostDirectory": "/tmp/docker",
+            "ContainerDirectory": "/tmp"
+        }
+    ],
+    "Ports": [
+        {
+            "ContainerPort": "8080"
+        },
+        {
+            "ContainerPort": "5005"
+        }
+    ],
+    "Image": {
+        "Name": "DOCKER_IMAGE",
+        "Update": true
+    }
+}

@@ -3,6 +3,7 @@ stages:
   - push-dev
   - push-int
   - push-ope
+  - bundle
 
 build_app:
   stage: build
@@ -64,3 +65,29 @@ push_image_ope:
     AWS_SECRET_ACCESS_KEY: ${OPE_AWS_SECRET_KEY}
     AWS_DEFAULT_REGION: eu-west-1
     ECR_REPOSITORY: ${OPE_ECR_REPO}
+
+prepare_bundle:
+  stage: bundle
+  image: alpine:latest
+  tags:
+    - aws
+    - docker
+    - build
+  only:
+    - develop
+    - stage
+    - master
+  variables:
+    http_proxy: ${PROXY_STRING}
+    https_proxy: ${PROXY_STRING}
+  script:
+    - apk add zip
+    - cd md2moin-web/eb-bundle
+    - sed -i "s|DOCKER_IMAGE|${DEV_ECR_REPO}/md2moin-web:${CI_COMMIT_SHORT_SHA}|g" Dockerrun.aws.json
+    - echo Generated Dockerrun
+    - cat Dockerrun.aws.json
+    - zip -r ${CI_COMMIT_SHORT_SHA}.zip .ebextensions/ Dockerrun.aws.json
+  artifacts:
+    paths:
+      - md2moin-web/eb-bundle
+    expire_in: 30 minutes
