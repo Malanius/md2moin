@@ -1,0 +1,396 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "md2moin tool beanstalk environment w/ Docker"
+
+Parameters:
+  AppName:
+    Description: Application name(lowercase)
+    Type: String
+  AppEnv:
+    Description: Environment (dev/int/ope)
+    Type: String
+    AllowedValues:
+      - dev
+      - int
+      - ope
+  DeployEnv:
+    Description: Environment (int/ope)
+    Type: String
+    AllowedValues:
+      - int
+      - ope
+  NetworkStack:
+    Description: Name of the stack which created the VPC and the subnets
+    Type: String
+
+Mappings:
+  # Certificates must be regional for load balancer
+  EnvironmentMap:
+    int:
+      DomainName: renault-tf-int.com
+      CertificateArn: arn:aws:acm:eu-west-1:832609832284:certificate/6e1802f5-372e-43f4-869b-14cff56779bb
+    ope:
+      DomainName: renault-tf.com
+      CertificateArn: arn:aws:acm:eu-west-1:248740582275:certificate/aba75c0e-9cdf-4efb-be84-82a2d76da554
+
+Resources:
+  ## IAM
+  Ec2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: '2012-10-17'
+      Path: "/"
+
+  Ec2EcrPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:*
+            Effect: Allow
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:aws:ecr:*:'
+                  - !Ref AWS::AccountId
+                  - ":repository/"
+                  - Fn::ImportValue: !Sub ${AppName}-${AppEnv}-ecr-name
+          - Action:
+              - ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource:
+              - "*"
+        Version: '2012-10-17'
+      PolicyName: CustomPolicy
+      Roles:
+        - !Ref Ec2Role
+
+  Ec2CloudwatchPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - cloudwatch:*
+            Effect: Allow
+            Resource:
+              - "*"
+        Version: '2012-10-17'
+      PolicyName: Cloudwatch
+      Roles:
+        - !Ref Ec2Role
+
+  BeanstalkServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: elasticbeanstalk
+            Effect: Allow
+            Principal:
+              Service: elasticbeanstalk.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
+      Path: "/"
+
+  BeanstalkHealthPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - elasticloadbalancing:DescribeInstanceHealth
+              - ec2:DescribeInstances
+              - ec2:DescribeInstanceStatus
+              - ec2:GetConsoleOutput
+              - ec2:AssociateAddress
+              - ec2:DescribeAddresses
+              - ec2:DescribeSecurityGroups
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - autoscaling:DescribeAutoScalingGroups
+              - autoscaling:DescribeAutoScalingInstances
+              - autoscaling:DescribeScalingActivities
+              - autoscaling:DescribeNotificationConfigurations
+            Effect: Allow
+            Resource:
+              - "*"
+        Version: '2012-10-17'
+      PolicyName: Health
+      Roles:
+        - !Ref BeanstalkServiceRole
+
+  ## Security groups
+  Ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub ${AppName}-${AppEnv} Security Group
+      SecurityGroupIngress:
+        - FromPort: '22'
+          IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+          ToPort: '22'
+        - FromPort: '80'
+          IpProtocol: tcp
+          SourceSecurityGroupId: !Ref ElbSecurityGroup
+          ToPort: '80'
+        - FromPort: '80'
+          IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+          ToPort: '80'
+        - FromPort: '443'
+          IpProtocol: tcp
+          SourceSecurityGroupId: !Ref ElbSecurityGroup
+          ToPort: '443'
+        - FromPort: '443'
+          IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+          ToPort: '443'
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-${AppEnv}-ec2-sg
+      VpcId:
+        Fn::ImportValue: !Sub "${NetworkStack}-id"
+
+
+  ElbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: bckelb Security Group
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: '80'
+          IpProtocol: tcp
+          ToPort: '80'
+        - CidrIp: 0.0.0.0/0
+          FromPort: '443'
+          IpProtocol: tcp
+          ToPort: '443'
+        - FromPort: '80'
+          IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+          ToPort: '80'
+        - FromPort: '443'
+          IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+          ToPort: '443'
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-${AppEnv}-elb-sg
+      VpcId:
+        Fn::ImportValue: !Sub "${NetworkStack}-id"
+
+  ## Beanstalk
+  BeanstalkEc2IamProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: !Sub /${AppName}/${AppEnv}/
+      Roles:
+        - !Ref Ec2Role
+      InstanceProfileName: !Sub ${AppName}-${AppEnv}-eb-ec2-profile
+
+  BeanstalkApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Sub ${AppName}-${AppEnv}
+      Description: !Sub ${AppName}-${AppEnv} environment
+
+  BeanstalkEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      EnvironmentName: !Sub ${AppName}-${AppEnv}-env
+      ApplicationName: !Ref BeanstalkApplication
+      Description: !Sub ${AppName}-${AppEnv} environment
+      TemplateName: !Ref BeanstalkConfigTemplate
+
+  BeanstalkConfigTemplate:
+    Type: AWS::ElasticBeanstalk::ConfigurationTemplate
+    Properties:
+      ApplicationName: !Ref BeanstalkApplication
+      Description: !Sub ${AppName}-${AppEnv}-eb-cnf
+      SolutionStackName: 64bit Amazon Linux 2018.03 v2.12.14 running Docker 18.06.1-ce
+      OptionSettings:
+        - Namespace: aws:autoscaling:asg
+          OptionName: MinSize
+          Value: "1"
+        - Namespace: aws:autoscaling:asg
+          OptionName: MaxSize
+          Value: "1"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: MeasureName
+          Value: CPUUtilization
+        - Namespace: aws:autoscaling:trigger
+          OptionName: Unit
+          Value: Percent
+        - Namespace: aws:autoscaling:trigger
+          OptionName: Period
+          Value: "5"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: Statistic
+          Value: Average
+        - Namespace: aws:autoscaling:trigger
+          OptionName: LowerThreshold
+          Value: "30"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: UpperThreshold
+          Value: "80"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: LowerBreachScaleIncrement
+          Value: "-1"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: UpperBreachScaleIncrement
+          Value: "1"
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: InstanceType
+          Value: t3.micro
+        - Namespace: aws:autoscaling:updatepolicy:rollingupdate
+          OptionName: RollingUpdateType
+          Value: Health
+        - Namespace: aws:autoscaling:updatepolicy:rollingupdate
+          OptionName: Timeout
+          Value: PT1H
+        - Namespace: aws:autoscaling:updatepolicy:rollingupdate
+          OptionName: RollingUpdateEnabled
+          Value: "true"
+        - Namespace: aws:elasticbeanstalk:command
+          OptionName: Timeout
+          Value: "3600"
+        - Namespace: aws:elasticbeanstalk:hostmanager
+          OptionName: LogPublicationControl
+          Value: "true"
+        - Namespace: aws:elasticbeanstalk:healthreporting:system
+          OptionName: SystemType
+          Value: enhanced
+        - Namespace: aws:elasticbeanstalk:application
+          OptionName: Application Healthcheck URL
+          Value: "/healthcheck"
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: EC2KeyName
+          Value: !Sub ${AppName}-${AppEnv}
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref BeanstalkEc2IamProfile
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref BeanstalkServiceRole
+        - Namespace: aws:ec2:vpc
+          OptionName: VPCId
+          Value:
+            Fn::ImportValue: !Sub "${NetworkStack}-id"
+        - Namespace: aws:ec2:vpc
+          OptionName: Subnets
+          Value:
+            Fn::Sub:
+              - ${PublicSubnet1},${PublicSubnet2}
+              - PublicSubnet1:
+                  Fn::ImportValue: !Sub "${NetworkStack}-private-subnet1"
+                PublicSubnet2:
+                  Fn::ImportValue: !Sub "${NetworkStack}-private-subnet2"
+        - Namespace: aws:ec2:vpc
+          OptionName: ELBSubnets
+          Value:
+            Fn::Sub:
+              - ${PublicSubnet1},${PublicSubnet2}
+              - PublicSubnet1:
+                  Fn::ImportValue: !Sub "${NetworkStack}-public-subnet1"
+                PublicSubnet2:
+                  Fn::ImportValue: !Sub "${NetworkStack}-public-subnet2"
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: ManagedActionsEnabled
+          Value: "true"
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: PreferredStartTime
+          Value: Sun:02:00
+        - Namespace: aws:elasticbeanstalk:managedactions:platformupdate
+          OptionName: UpdateLevel
+          Value: minor
+        - Namespace: aws:elasticbeanstalk:managedactions:platformupdate
+          OptionName: InstanceRefreshEnabled
+          Value: "true"
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: SecurityGroups
+          Value: !Ref Ec2SecurityGroup
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: SSHSourceRestriction
+          Value:
+            Fn::Join:
+              - ""
+              - - tcp,22,22,
+                - Fn::ImportValue: !Sub ${DeployEnv}-bastion-sg-id
+        - Namespace: aws:elasticbeanstalk:command
+          OptionName: BatchSize
+          Value: "30"
+        - Namespace: aws:elasticbeanstalk:healthreporting:system
+          OptionName: ConfigDocument
+          Value:
+            '{"CloudWatchMetrics": {"Environment": {"ApplicationLatencyP99.9": 60,"InstancesSevere":
+            60,"ApplicationLatencyP90": 60,"ApplicationLatencyP99": 60,"ApplicationLatencyP95":
+            60,"InstancesUnknown": 60,"ApplicationLatencyP85": 60,"InstancesInfo": 60,"ApplicationRequests2xx":
+            60,"InstancesDegraded": 60,"InstancesWarning": 60,"ApplicationLatencyP50":
+            60,"ApplicationRequestsTotal": 60,"InstancesNoData": 60,"InstancesPending":
+            60,"ApplicationLatencyP10": 60,"ApplicationRequests5xx": 60,"ApplicationLatencyP75":
+            60,"InstancesOk": 60,"ApplicationRequests3xx": 60,"ApplicationRequests4xx":
+            60},"Instance": {"ApplicationLatencyP99.9": 60,"ApplicationLatencyP90": 60,"ApplicationLatencyP99":
+            60,"ApplicationLatencyP95": 60,"ApplicationLatencyP85": 60,"CPUUser": 60,"ApplicationRequests2xx":
+            60,"CPUIdle": 60,"ApplicationLatencyP50": 60,"ApplicationRequestsTotal": 60,"RootFilesystemUtil":
+            60,"LoadAverage1min": 60,"CPUIrq": 60,"CPUNice": 60,"CPUIowait": 60,"ApplicationLatencyP10":
+            60,"LoadAverage5min": 60,"ApplicationRequests5xx": 60,"ApplicationLatencyP75":
+            60,"CPUSystem": 60,"ApplicationRequests3xx": 60,"ApplicationRequests4xx":
+            60,"InstanceHealth": 60,"CPUSoftirq": 60}},"Version": 1}'
+        - Namespace: aws:elb:listener:80
+          OptionName: InstancePort
+          Value: "80"
+        - Namespace: aws:elb:listener:80
+          OptionName: ListenerProtocol
+          Value: HTTP
+        - Namespace: aws:elb:listener:80
+          OptionName: InstanceProtocol
+          Value: HTTP
+        - Namespace: aws:elb:listener:443
+          OptionName: InstancePort
+          Value: "80"
+        - Namespace: aws:elb:listener:443
+          OptionName: ListenerProtocol
+          Value: HTTPS
+        - Namespace: aws:elb:listener:443
+          OptionName: SSLCertificateId
+          Value: !FindInMap [EnvironmentMap, !Ref DeployEnv, CertificateArn]
+        - Namespace: aws:elb:listener:443
+          OptionName: InstanceProtocol
+          Value: HTTP
+
+  ## DNS
+  ApiDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn: BeanstalkEnvironment
+    Properties:
+      HostedZoneName: !Sub
+        - ${Domain}.
+        - { Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
+      RecordSets:
+        - Name: !Sub
+            - ${AppName}-${AppEnv}.${Domain}
+            - { Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z3NF1Z3NOM5OY2 # Magic id for all Beanstalks in eu-west-1
+            DNSName: !GetAtt BeanstalkEnvironment.EndpointURL
