@@ -2,7 +2,7 @@
 
 ENV=${1}
 if [[ ${ENV} == "dev" ]] || [[ ${ENV} == "int" ]] || [[ ${ENV} == "ope" ]]; then
-        echo "Creating stack with ${ENV^^} configuration...";
+        echo "Updating stack with ${ENV^^} configuration...";
         . ../_scripts/env.sh ${ENV}
          aws cloudformation update-stack \
             --template-body "file://beanstalk.yaml" \
