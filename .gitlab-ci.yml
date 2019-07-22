@@ -88,7 +88,7 @@ prepare_bundle:
     - sed -i "s|DOCKER_IMAGE|${DEV_ECR_REPO}/md2moin-web:${CI_COMMIT_SHORT_SHA}|g" Dockerrun.aws.json
     - echo Generated Dockerrun
     - cat Dockerrun.aws.json
-    - zip -r ${CI_COMMIT_SHORT_SHA}.zip .ebextensions/ Dockerrun.aws.json
+    - zip -r ${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}.zip .ebextensions/ Dockerrun.aws.json
   artifacts:
     paths:
       - md2moin-web/eb-bundle
@@ -102,7 +102,7 @@ prepare_bundle:
     - build
   script:
     - echo "Uploading bundle..."
-    - aws s3 cp md2moin-web/eb-bundle/${CI_COMMIT_SHORT_SHA}.zip s3://${S3_BUCKET}/
+    - aws s3 cp md2moin-web/eb-bundle/${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}.zip s3://${S3_BUCKET}/
 
 upload_bundle_dev:
   <<: *upload_bundle
@@ -148,15 +148,15 @@ upload_bundle_ope:
     - |
       aws elasticbeanstalk create-application-version \
       	--application-name ${EB_APP_NAME} \
-      	--version-label "md2moin-ci-${CI_COMMIT_SHORT_SHA}" \
+      	--version-label "md2moin-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}" \
       	--description "${CI_COMMIT_MESSAGE}" \
-      	--source-bundle S3Bucket="${S3_BUCKET}",S3Key="${CI_COMMIT_SHORT_SHA}.zip"
+      	--source-bundle S3Bucket="${S3_BUCKET}",S3Key="${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}.zip"
     - echo "Deploying new application version..."
     - |
       aws elasticbeanstalk update-environment \
         --application-name "${EB_APP_NAME}" \
         --environment-name "${EB_APP_NAME}-env" \
-        --version-label "md2moin-ci-${CI_COMMIT_SHORT_SHA}"
+        --version-label "md2moin-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
 
 deploy_dev:
   <<: *deploy_app
