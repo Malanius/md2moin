@@ -10,6 +10,7 @@ if [[ ${ENV} == "dev" ]] || [[ ${ENV} == "int" ]] || [[ ${ENV} == "ope" ]]; then
             --tags \
                 "Key=Env,Value=${APP_ENV^^}" \
                 "Key=tf:owner,Value=${OWNER}" \
+                "Key=App,Value=${APP_NAME}" \
             --parameters \
                 "ParameterKey=AppName,ParameterValue=${APP_NAME}" \
                 "ParameterKey=AppEnv,ParameterValue=${APP_ENV}" \
