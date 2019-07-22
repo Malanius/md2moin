@@ -44,7 +44,7 @@ Resources:
     Type: AWS::IAM::User
     Properties:
       Path: /technical-user/
-      UserName: !Sub ${AppName}-${AppEnv}-deploy
+      UserName: !Sub ${AppName}-${AppEnv}-ecr
 
   S3UserAccessKey:
     Type: AWS::IAM::AccessKey
