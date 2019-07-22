@@ -4,6 +4,9 @@ stages:
   - push-int
   - push-ope
   - bundle
+  - upload-dev
+  - upload-int
+  - upload-ope
 
 build_app:
   stage: build
@@ -91,3 +94,45 @@ prepare_bundle:
     paths:
       - md2moin-web/eb-bundle
     expire_in: 30 minutes
+
+.upload_beanstalk_bundle: &upload_bundle
+  tags:
+    - aws
+    - docker
+    - build
+  script:
+    - echo "Uploading bundle..."
+    - aws s3 cp md2moin-web/eb-bundle/${CI_COMMIT_SHORT_SHA}.zip s3://${S3_BUCKET}/
+
+upload_bundle_dev:
+  <<: *upload_bundle
+  stage: upload-dev
+  only:
+    - develop
+  variables:
+    AWS_ACCESS_KEY_ID: ${DEV_DEPLOY_ACCESS_KEY}
+    AWS_SECRET_ACCESS_KEY: ${DEV_DEPLOY_SECRET_KEY}
+    AWS_DEFAULT_REGION: eu-west-1
+    S3_BUCKET: ${DEV_S3_DEPLOY}
+
+upload_bundle_int:
+  <<: *upload_bundle
+  stage: upload-int
+  only:
+    - stage
+  variables:
+    AWS_ACCESS_KEY_ID: ${INT_DEPLOY_ACCESS_KEY}
+    AWS_SECRET_ACCESS_KEY: ${INT_DEPLOY_SECRET_KEY}
+    AWS_DEFAULT_REGION: eu-west-1
+    S3_BUCKET: ${INT_S3_DEPLOY}
+
+upload_bundle_ope:
+  <<: *upload_bundle
+  stage: upload-ope
+  only:
+    - master
+  variables:
+    AWS_ACCESS_KEY_ID: ${OPE_DEPLOY_ACCESS_KEY}
+    AWS_SECRET_ACCESS_KEY: ${OPE_DEPLOY_SECRET_KEY}
+    AWS_DEFAULT_REGION: eu-west-1
+    S3_BUCKET: ${OPE_S3_DEPLOY}
