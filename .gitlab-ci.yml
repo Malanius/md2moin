@@ -1,15 +1,9 @@
 stages:
   - build
-  - push-dev
-  - push-int
-  - push-ope
+  - push
   - bundle
-  - upload-dev
-  - upload-int
-  - upload-ope
-  - deploy-dev
-  - deploy-int
-  - deploy-ope
+  - upload
+  - deploy
 
 build_app:
   stage: build
@@ -42,7 +36,7 @@ build_app:
 ## Push docker image to ECR
 push_image_dev:
   <<: *build_push_image
-  stage: push-dev
+  stage: push
   only:
     - develop
   variables:
@@ -53,7 +47,7 @@ push_image_dev:
 
 push_image_int:
   <<: *build_push_image
-  stage: push-int
+  stage: push
   only:
     - stage
   variables:
@@ -64,7 +58,7 @@ push_image_int:
 
 push_image_ope:
   <<: *build_push_image
-  stage: push-ope
+  stage: push
   only:
     - master
   variables:
@@ -112,7 +106,7 @@ prepare_bundle:
 
 upload_bundle_dev:
   <<: *upload_bundle
-  stage: upload-dev
+  stage: upload
   only:
     - develop
   variables:
@@ -123,7 +117,7 @@ upload_bundle_dev:
 
 upload_bundle_int:
   <<: *upload_bundle
-  stage: upload-int
+  stage: upload
   only:
     - stage
   variables:
@@ -134,7 +128,7 @@ upload_bundle_int:
 
 upload_bundle_ope:
   <<: *upload_bundle
-  stage: upload-ope
+  stage: upload
   only:
     - master
   variables:
@@ -166,7 +160,7 @@ upload_bundle_ope:
 
 deploy_dev:
   <<: *deploy_app
-  stage: deploy-dev
+  stage: deploy
   only:
     - develop
   variables:
@@ -178,7 +172,7 @@ deploy_dev:
 
 deploy_int:
   <<: *deploy_app
-  stage: deploy-int
+  stage: deploy
   only:
     - stage
   variables:
@@ -190,7 +184,7 @@ deploy_int:
 
 deploy_ope:
   <<: *deploy_app
-  stage: deploy-ope
+  stage: deploy
   only:
     - master
   variables:
