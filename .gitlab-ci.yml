@@ -68,7 +68,7 @@ push_image_ope:
     ECR_REPOSITORY: ${OPE_ECR_REPO}
 
 ## Prepare Beanstalk bundle
-prepare_bundle:
+.prepare_eb_bundle: &prepare_bundle
   stage: bundle
   image: alpine:latest
   tags:
@@ -85,7 +85,7 @@ prepare_bundle:
   script:
     - apk add zip
     - cd md2moin-web/eb-bundle
-    - sed -i "s|DOCKER_IMAGE|${DEV_ECR_REPO}/md2moin-web:${CI_COMMIT_SHORT_SHA}|g" Dockerrun.aws.json
+    - sed -i "s|DOCKER_IMAGE|${ECR_REPO}/md2moin-web:${CI_COMMIT_SHORT_SHA}|g" Dockerrun.aws.json
     - echo Generated Dockerrun
     - cat Dockerrun.aws.json
     - zip -r ${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}.zip .ebextensions/ Dockerrun.aws.json
@@ -93,6 +93,30 @@ prepare_bundle:
     paths:
       - md2moin-web/eb-bundle
     expire_in: 30 minutes
+
+prepare_bundle_dev:
+  <<: *prepare_bundle
+  stage: bundle
+  only:
+    - develop
+  variables:
+    ECR_REPO: ${DEV_ECR_REPO}
+
+prepare_bundle_int:
+  <<: *prepare_bundle
+  stage: bundle
+  only:
+    - stage
+  variables:
+    ECR_REPO: ${INT_ECR_REPO}
+
+prepare_bundle_ope:
+  <<: *prepare_bundle
+  stage: bundle
+  only:
+    - master
+  variables:
+    ECR_REPO: ${OPE_ECR_REPO}
 
 ## Upload Beanstalk bundle
 .upload_beanstalk_bundle: &upload_bundle
