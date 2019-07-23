@@ -155,7 +155,7 @@ upload_bundle_ope:
     - |
       aws elasticbeanstalk update-environment \
         --application-name "${EB_APP_NAME}" \
-        --environment-name "${EB_APP_NAME}-env" \
+        --environment-name "${EB_APP_NAME}-${STAGE}" \
         --version-label "md2moin-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
 
 deploy_dev:
@@ -169,6 +169,7 @@ deploy_dev:
     AWS_DEFAULT_REGION: eu-west-1
     S3_BUCKET: ${DEV_S3_DEPLOY}
     EB_APP_NAME: ${DEV_EB_APP_NAME}
+    STAGE: dev
 
 deploy_int:
   <<: *deploy_app
@@ -181,6 +182,7 @@ deploy_int:
     AWS_DEFAULT_REGION: eu-west-1
     S3_BUCKET: ${INT_S3_DEPLOY}
     EB_APP_NAME: ${INT_EB_APP_NAME}
+    STAGE: int
 
 deploy_ope:
   <<: *deploy_app
@@ -193,3 +195,4 @@ deploy_ope:
     AWS_DEFAULT_REGION: eu-west-1
     S3_BUCKET: ${OPE_S3_DEPLOY}
     EB_APP_NAME: ${OPE_EB_APP_NAME}
+    STAGE: ope
