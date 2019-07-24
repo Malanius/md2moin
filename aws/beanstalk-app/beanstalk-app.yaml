@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "md2moin tool beanstalk application"
+
+Parameters:
+  AppName:
+    Description: Application name(lowercase)
+    Type: String
+
+Resources:
+
+  BeanstalkApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Sub ${AppName}
+      Description: !Sub ${AppName} app
+
+Outputs:
+  EbAppName:
+    Value: !Ref BeanstalkApplication
+    Export:
+      Name: !Sub ${AppName}-eb-app
+    Description: Name of Beanstalk application

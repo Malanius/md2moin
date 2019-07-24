@@ -32,6 +32,9 @@ Mappings:
       DomainName: renault-tf.com
       CertificateArn: arn:aws:acm:eu-west-1:248740582275:certificate/aba75c0e-9cdf-4efb-be84-82a2d76da554
 
+Conditions:
+  isDev: !Equals [!Ref AppEnv, "dev"]
+
 Resources:
   ## IAM
   Ec2Role:
@@ -169,7 +172,6 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${NetworkStack}-id"
 
-
   ElbSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -208,24 +210,20 @@ Resources:
         - !Ref Ec2Role
       InstanceProfileName: !Sub ${AppName}-${AppEnv}-eb-ec2-profile
 
-  BeanstalkApplication:
-    Type: AWS::ElasticBeanstalk::Application
-    Properties:
-      ApplicationName: !Sub ${AppName}-${AppEnv}
-      Description: !Sub ${AppName}-${AppEnv} environment
-
   BeanstalkEnvironment:
     Type: AWS::ElasticBeanstalk::Environment
     Properties:
-      EnvironmentName: !Sub ${AppName}-${AppEnv}-env
-      ApplicationName: !Ref BeanstalkApplication
+      EnvironmentName: !Sub ${AppName}-${AppEnv}
+      ApplicationName:
+        Fn::ImportValue: !Sub "${AppName}-eb-app"
       Description: !Sub ${AppName}-${AppEnv} environment
       TemplateName: !Ref BeanstalkConfigTemplate
 
   BeanstalkConfigTemplate:
     Type: AWS::ElasticBeanstalk::ConfigurationTemplate
     Properties:
-      ApplicationName: !Ref BeanstalkApplication
+      ApplicationName:
+        Fn::ImportValue: !Sub "${AppName}-eb-app"
       Description: !Sub ${AppName}-${AppEnv}-eb-cnf
       SolutionStackName: 64bit Amazon Linux 2018.03 v2.12.14 running Docker 18.06.1-ce
       OptionSettings:
@@ -379,7 +377,7 @@ Resources:
           Value: HTTP
 
   ## DNS
-  ApiDNSName:
+  AppDNSName:
     Type: AWS::Route53::RecordSetGroup
     DependsOn: BeanstalkEnvironment
     Properties:
@@ -388,9 +386,16 @@ Resources:
         - { Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
       RecordSets:
         - Name: !Sub
-            - ${AppName}-${AppEnv}.${Domain}
-            - { Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
+            - ${AppName}${Stage}.${Domain}
+            - { Stage: !If [isDev, "-dev", ""], Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
           Type: A
           AliasTarget:
             HostedZoneId: Z3NF1Z3NOM5OY2 # Magic id for all Beanstalks in eu-west-1
             DNSName: !GetAtt BeanstalkEnvironment.EndpointURL
+
+Outputs:
+  AppURL:
+    Value: !Sub
+      - https://${AppName}${Stage}.${Domain}
+      - { Stage: !If [isDev, "-dev", ""], Domain: !FindInMap [EnvironmentMap, !Ref DeployEnv, DomainName]}
+    Description: DNS for the beanstalk in Route 53

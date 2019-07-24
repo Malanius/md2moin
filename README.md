@@ -23,7 +23,8 @@ Before using the scripts, update `_scripts/env.sh` to set correct AWS CLI profil
 The order of creating the stacks is as follows:
 
 1. ECR
-1. Beanstalk
+1. Beanstalk app
+1. Beanstalk env
 1. Deploy
 
 For `Beanstalk` there are some required dependencies on other templates to import value from - VPC info of VPC the Beanstalk environment is created in and bastion template from where the bastion's security group is used.
