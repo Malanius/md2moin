@@ -23,7 +23,7 @@ public class CodeBlockConverterImplTest {
     @Test
     public void convertInlineCode() {
         String input = "Some text with `inline code` inserted.\nSome text with `inline code` inserted.";
-        String expected = "Some text with {inline code} inserted.\nSome text with {inline code} inserted.";
+        String expected = "Some text with {{{inline code}}} inserted.\nSome text with {{{inline code}}} inserted.";
 
         assertEquals(expected, converter.convertInlineCode(input));
     }
