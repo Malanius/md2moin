@@ -2,6 +2,16 @@
 
 This simple tool can be used to convert markdown written text to (MoinMoin)[https://moinmo.in/] wiki syntax. 
 
+## build
+Running the following will create a docker container tagged `malanius/md2moin-web:latest`:
+```
+mvn clean package
+```
+A .jar containing the application (for deployment with tomcat/catalina) resides in
+```
+md2moin-web/target/md2moin-web-1.0-SNAPSHOT.jar
+```
+
 ## AWS
 
 Application currently runs on AWS Elastic Beanstalk environment with Docker.
