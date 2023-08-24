@@ -5,6 +5,7 @@ import net.malanius.md2moin.core.emphasis.EmphasisConverterImpl;
 import net.malanius.md2moin.core.headers.HeaderConverterImpl;
 import net.malanius.md2moin.core.lists.ListConverterImpl;
 import net.malanius.md2moin.core.tables.TableConverterImpl;
+import net.malanius.md2moin.core.links.LinkConverterImpl;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +28,8 @@ public class ConverterImplTest {
                 new HeaderConverterImpl(),
                 new ListConverterImpl(),
                 new CodeBlockConverterImpl(),
-                new TableConverterImpl());
+                new TableConverterImpl(),
+                new LinkConverterImpl());
     }
 
     @After
