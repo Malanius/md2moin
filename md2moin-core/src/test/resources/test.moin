@@ -49,8 +49,8 @@ And yet --(another)-- occurrence.
 
 == Links ==
 
-This is some text with [Example](https://example.com) link. And yet [another](www.example.com) one.
-This is [link](http://example.com) on another line.
+This is some text with [https://example.com Example] link. And yet [www.example.com another] one.
+This is [http://example.com link] on another line.
 
 == Code blocks ==
 

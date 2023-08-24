@@ -6,6 +6,7 @@ import net.malanius.md2moin.core.emphasis.EmphasisConverter;
 import net.malanius.md2moin.core.headers.HeaderConverter;
 import net.malanius.md2moin.core.lists.ListConverter;
 import net.malanius.md2moin.core.tables.TableConverter;
+import net.malanius.md2moin.core.links.LinkConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +19,16 @@ public class ConverterImpl implements Converter {
     private final ListConverter listConverter;
     private final CodeBlockConverter codeblockConverter;
     private final TableConverter tableConverter;
+    private final LinkConverter linkConverter;
 
     @Autowired
-    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeBlockConverter codeBlockConverter, TableConverter tableConverter) {
+    public ConverterImpl(EmphasisConverter emphasisConverter, HeaderConverter headerConverter, ListConverter listConverter, CodeBlockConverter codeBlockConverter, TableConverter tableConverter, LinkConverter linkConverter) {
         this.emphasisConverter = emphasisConverter;
         this.headerConverter = headerConverter;
         this.listConverter = listConverter;
         this.codeblockConverter = codeBlockConverter;
         this.tableConverter = tableConverter;
+        this.linkConverter = linkConverter;
     }
 
     @Override
@@ -50,6 +53,7 @@ public class ConverterImpl implements Converter {
         converted = codeblockConverter.convertCodeBlock(converted);
         converted = codeblockConverter.convertInlineCode(converted);
         converted = tableConverter.convertTable(converted);
+        converted = linkConverter.convertLink(converted);
         return converted;
     }
 
